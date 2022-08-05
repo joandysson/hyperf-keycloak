@@ -1,5 +1,5 @@
 {
-  "name": "Joandysson/keycloak-adapter",
+  "name": "joandysson/keycloak-adapter",
   "license": "MIT",
   "description": "Easy PHP adapter for Keycloak authentication",
   "version": "0.0.1",
