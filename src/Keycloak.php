@@ -25,7 +25,7 @@ use Exception;
  * Class Keycloak
  * @package Joandysson\Keycloak
  */
-class Keycloak
+abstract class Keycloak
 {
     /** @var KeycloakAdapter */
     protected KeycloakAdapter $keycloak;
