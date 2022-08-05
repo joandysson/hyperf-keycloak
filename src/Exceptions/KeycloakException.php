@@ -11,7 +11,7 @@ declare(strict_types=1);
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
 
-namespace Easy\Keycloak\Exceptions;
+namespace Joandysson\Keycloak\Exceptions;
 
 class KeycloakException extends \Exception
 {

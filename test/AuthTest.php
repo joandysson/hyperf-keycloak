@@ -2,8 +2,8 @@
 
 namespace HyperfTest;
 
-use Easy\Keycloak\Exceptions\KeycloakException;
-use Easy\Keycloak\KeycloakAdapter;
+use Joandysson\Keycloak\Exceptions\KeycloakException;
+use Joandysson\Keycloak\KeycloakAdapter;
 use PHPUnit\Framework\TestCase;
 
 class AuthTest extends TestCase {

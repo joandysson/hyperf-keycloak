@@ -11,13 +11,13 @@ declare(strict_types=1);
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
 
-namespace Easy\Keycloak;
+namespace Joandysson\Keycloak;
 
-use Easy\Keycloak\Exceptions\CurlException;
-use Easy\Keycloak\Exceptions\KeycloakException;
-use Easy\Keycloak\Utils\AccessToken;
-use Easy\Keycloak\Utils\KeycloakAPI;
-use Easy\Keycloak\Utils\RefreshToken;
+use Joandysson\Keycloak\Exceptions\CurlException;
+use Joandysson\Keycloak\Exceptions\KeycloakException;
+use Joandysson\Keycloak\Utils\AccessToken;
+use Joandysson\Keycloak\Utils\KeycloakAPI;
+use Joandysson\Keycloak\Utils\RefreshToken;
 
 /**
  * @property-read string       $apiClientId

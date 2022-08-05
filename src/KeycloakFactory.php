@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @contact  @joandysson
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
-namespace Easy\Keycloak;
+namespace Joandysson\Keycloak;
 
 use Hyperf\Contract\ConfigInterface;
 use Psr\Container\ContainerInterface;

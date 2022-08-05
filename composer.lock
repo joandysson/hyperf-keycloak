@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9b76bc08d239fe45d09ccf08fd999543",
+    "content-hash": "64188cc8b618b13bc66593dce2b62f6a",
     "packages": [
         {
             "name": "hyperf/contract",

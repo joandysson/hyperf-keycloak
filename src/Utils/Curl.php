@@ -2,11 +2,6 @@
 
 declare(strict_types=1);
 
-namespace Easy\Keycloak\Utils;
-
-use CurlHandle;
-use Easy\Keycloak\Exceptions\CurlException;
-
 /**
  * This file is part of Hyper Keycloak.
  *
@@ -15,6 +10,12 @@ use Easy\Keycloak\Exceptions\CurlException;
  * @contact  @joandysson
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
+
+namespace Joandysson\Keycloak\Utils;
+
+use CurlHandle;
+use Joandysson\Keycloak\Exceptions\CurlException;
+
 class Curl
 {
     const POST = 'POST';

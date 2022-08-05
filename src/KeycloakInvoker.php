@@ -9,7 +9,7 @@
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
 
-namespace Easy\Keycloak;
+namespace Joandysson\Keycloak;
 
 use Hyperf\Contract\ConfigInterface;
 use Psr\Container\ContainerExceptionInterface;

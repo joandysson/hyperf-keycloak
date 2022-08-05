@@ -11,7 +11,8 @@ declare(strict_types=1);
  * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
  */
 
-namespace Easy\Keycloak\Utils;
+namespace Joandysson\Keycloak\Utils;
+
 use stdClass;
 
 /**

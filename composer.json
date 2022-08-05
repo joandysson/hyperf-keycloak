@@ -27,7 +27,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Easy\\Keycloak\\": "src/"
+      "Joandysson\\Keycloak\\": "src/"
     }
   },
   "autoload-dev": {
@@ -46,7 +46,7 @@
   },
   "extra": {
       "hyperf": {
-        "config": "Easy\\Keycloak\\ConfigProvider"
+        "config": "Joandysson\\Keycloak\\ConfigProvider"
       }
   },
   "scripts": {
