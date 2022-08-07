@@ -20,14 +20,17 @@ namespace Joandysson\Keycloak\Utils;
  */
 abstract class Token
 {
-    /** @var int */
-    protected int $expiration;
+    /** @var string */
+    protected string $accessToken;
+
+    /** @var string */
+    protected string $refreshToken;
 
     /**
      * Token constructor.
      * @param int $expiration
      */
-    public function __construct(int $expiration)
+    public function __construct(protected int $expiration)
     {
         $this->expiration = $expiration;
     }

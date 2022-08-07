@@ -15,202 +15,71 @@ namespace Joandysson\Keycloak;
 
 use Joandysson\Keycloak\Exceptions\CurlException;
 use Joandysson\Keycloak\Exceptions\KeycloakException;
-use Joandysson\Keycloak\Utils\AuthorizationResponse;
 use Joandysson\Keycloak\Utils\KeycloakAPI;
+use Joandysson\Keycloak\Utils\AccessToken;
 use Joandysson\Keycloak\Utils\RefreshToken;
-use Joandysson\Keycloak\Utils\UserProfile;
-use Exception;
 
 /**
  * Class Keycloak
  * @package Joandysson\Keycloak
  */
-abstract class Keycloak
+class Keycloak
 {
-    /** @var KeycloakAdapter */
-    protected KeycloakAdapter $keycloak;
+    /** @var string|null */
+    private ?string $state = null;
+
+    /** @var array */
+    private array $scopes = [];
+
+    /** @var int */
+    public int $reAuthSleepTime = 30;
 
     /** @var string */
-    protected string $state;
+    private string $apiPassword;
 
     /**
-     * Re-authentication loads KeycloakAdapter, so keep this number as high as possible.
-     * This means the re-authentication process with Refresh Token will be skipped for 30 seconds after last
-     * re-authentication.
-     *
-     * @var int
+     * @var string
      */
-    public int $reAuthSleepTime = 30;
+    private string $apiUsername;
+
+    /**
+     * @var string
+     */
+    private string $apiClientSecret;
+
+    /**
+     * @var string
+     */
+    private string $apiClientId;
+
+    /** @var AccessToken */
+    private AccessToken $apiAccessToken;
+
+    /** @var RefreshToken */
+    private RefreshToken $apiRefreshToken;
+
+    /**
+     * @param string $host
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $redirectUri
+     * @throws KeycloakException
+     */
+    public function __construct(
+        protected string $host,
+        protected string $clientId,
+        protected string $clientSecret,
+        protected string $redirectUri
+    ){
+        if (!filter_var($this->redirectUri, FILTER_VALIDATE_URL)) {
+            throw new KeycloakException('Invalid redirect Uri');
+        }
+    }
 
     /**
      * Keycloak constructor.
      * @param KeycloakAdapter $keycloak
      */
-    public function __construct(KeycloakAdapter $keycloak)
-    {
-        $this->keycloak = $keycloak;
-    }
-
-    /**
-     * @param string|null $authorizationCode
-     * @return bool
-     * @throws CurlException
-     * @throws Exceptions\KeycloakException
-     */
-    public function authorize(string $authorizationCode = null): bool
-    {
-        if (empty($authorizationCode)) {
-            return false;
-        }
-
-        $response = KeycloakAPI::getAuthorization($this->keycloak, $authorizationCode);
-
-        $this->setAuthorized(true);
-        $this->authorized($this->getUserProfile($response));
-
-        return true;
-    }
-
-    /**
-     * Authorizes and returns TRUE or FALSE.
-     * And triggers method authorized() and setAuthorized()
-     *
-     * @return bool
-     * @throws KeycloakException
-     */
-    public function invokeForceAuthorization(): bool
-    {
-        $refreshToken = $this->getRefreshToken();
-
-        // waiting for next re-auth
-        if (time() < ($this->getLastReAuth() + $this->reAuthSleepTime)) {
-            return true;
-        }
-
-        try {
-            $response = KeycloakAPI::reauthorize($this->keycloak, $refreshToken);
-            $this->setAuthorized(true);
-            $this->authorized($this->getUserProfile($response));
-            $this->notifyReAuth();
-        } catch (Exception $e) {
-            // TODO: To remove it
-            header('Location: ' . $this->keycloak->getLoginUrl());
-            exit();
-        }
-
-        return true;
-    }
-
-    public function isSessionExpired(): bool
-    {
-        $refreshToken = $this->getRefreshToken();
-
-        // waiting for next re-auth
-        if (time() < ($this->getLastReAuth() + $this->reAuthSleepTime)) {
-            return false;
-        }
-
-        try {
-            $response = KeycloakAPI::reauthorize($this->keycloak, $refreshToken);
-            $this->setAuthorized(true);
-            $this->authorized($this->getUserProfile($response));
-            $this->notifyReAuth();
-
-            return false;
-        } catch (Exception $e) {
-            return true;
-        }
-    }
-
-    /**
-     * @param AuthorizationResponse $response
-     * @return UserProfile
-     */
-    private function getUserProfile(AuthorizationResponse $response): UserProfile
-    {
-        $userIdentity = $response->accessToken->getUserIdentity();
-
-        return new UserProfile(
-            $userIdentity->getId(),
-            $userIdentity->getName(),
-            $userIdentity->getEmail(),
-            $response->refreshToken->refreshToken,
-            $response->refreshToken->expiration,
-            $userIdentity->getRoles($this->keycloak->clientId),
-            $userIdentity->username
-        );
-    }
-
-    /**
-     * @throws CurlException
-     */
-    public function logoutSSO(): void
-    {
-        $refreshToken = $this->getRefreshToken();
-        KeycloakAPI::logout($this->keycloak, $refreshToken);
-    }
-
-    /**
-     * Returns a login URL to KeycloakAdapter.
-     *
-     * @return string
-     * @throws KeycloakException
-     */
-    public function getLoginUrl(): string
-    {
-        return $this->keycloak->getLoginUrl() . '&state=' . $this->state;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRegistrationUrl(): string
-    {
-        return $this->keycloak->getRegistrationUrl();
-    }
-
-    /**
-     * @return bool
-     */
-    abstract public function isAuthorized(): bool;
-
-    /**
-     * @param bool $authorized
-     * @return bool
-     */
-    abstract protected function setAuthorized(bool $authorized): bool;
-
-    /**
-     * @param UserProfile $userProfile
-     * @return bool
-     */
-    abstract protected function authorized(UserProfile $userProfile): bool;
-
-    public function setAuthSleep(int $seconds): void
-    {
-    }
-
-    /**
-     * @return int
-     */
-    private function getLastReAuth(): int
-    {
-        if (isset($_SESSION['auth']['lastReAuth'])) {
-            return $_SESSION['auth']['lastReAuth'];
-        }
-
-        return 0;
-    }
-
-    private function notifyReAuth(): void
-    {
-        $_SESSION['auth']['lastReAuth'] = time();
-    }
-
-    /**
-     * @return RefreshToken
-     */
-    abstract protected function getRefreshToken(): RefreshToken;
 
     /**
      * Sets the state
@@ -219,7 +88,7 @@ abstract class Keycloak
      *
      * @param string $state
      */
-        public function setState(string $state): void
+    public function setState(string $state): void
     {
         $this->state = $state;
     }
@@ -230,10 +99,205 @@ abstract class Keycloak
      * @return bool
      * @throws CurlException
      */
-    public function logIn(string $username, string $password): bool
+    public function logIn(string $username, string $password)
     {
         $userProfile = KeycloakAPI::logIn($this->keycloak, $username, $password);
 
-        return $this->authorized($userProfile);
+        // return $this->authorized($userProfile);
     }
+
+    /**
+     * @return string
+     */
+    public function getApiClientId(): string
+    {
+        return $this->apiClientId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiClientSecret(): string
+    {
+        return $this->apiClientSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiPassword(): string
+    {
+        return $this->apiPassword;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiUsername(): string
+    {
+        return $this->apiUsername;
+    }
+
+    /**
+     * @return RefreshToken
+     * @throws CurlException
+     */
+    public function getApiRefreshToken(): RefreshToken
+    {
+        return $this->apiRefreshToken;
+    }
+
+    /**
+     * @return AccessToken
+     * @throws CurlException
+     * @throws KeycloakException
+     */
+    public function getApiAccessToken(): AccessToken
+    {
+
+        return $this->apiAccessToken;
+    }
+
+    /**
+     * @param string $firstname
+     * @param string $lastname
+     * @param string $email
+     * @return bool
+     * @throws CurlException
+     */
+    public function createUser(string $firstname, string $lastname, string $email): bool
+    {
+        return KeycloakAPI::createUser($this, $email, $firstname, $lastname, $email);
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasApiAccessTokenExpired(): bool
+    {
+        if (!isset($_SESSION['auth']['api_access_token']['expiration'])) {
+            return true;
+        }
+
+        if ($_SESSION['auth']['api_access_token']['expiration'] < time()) {
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * @return string
+     */
+    public function getRedirectUri(): string
+    {
+        return $this->redirectUri;
+    }
+
+    /**
+     * @return string
+     */
+    public function getHost(): string
+    {
+        return $this->host;
+    }
+
+    /**
+     * @param array $scopes
+     * @return void
+     */
+    public function setScopes(array $scopes): void
+    {
+        $this->scopes = array_merge($this->scopes, $scopes);
+    }
+
+    /**
+     * @return string
+     * @throws KeycloakException
+     */
+    public function getLoginUrl(): string
+    {
+        return sprintf('%s/protocol/openid-connect/auth?%s',
+            $this->host,
+            $this->parameters()
+        );
+    }
+
+    private function parameters(): string
+    {
+        $parameters = [
+            'client_id' => $this->clientId,
+            'response_type' => 'code',
+            'redirect_uri' => $this->redirectUri
+        ];
+
+        if ($this->state) {
+            $parameters = array_merge($parameters, [
+                'state' => $this->state
+            ]);
+        }
+
+        if (!empty($this->scopes)) {
+            $parameters = array_merge($parameters, [
+                'scope' => implode(' ', $this->scopes)
+            ]);
+        }
+
+        return http_build_query($parameters);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegistrationUrl(): string
+    {
+        return sprintf('%s/clients-registrations/openid-connect?%s',
+            $this->host, $this->parameters());
+
+//        TODO: to watch after
+//        return '$this->host/protocol/openid-connect/registrations?client_id=$this->clientId&response_type=code&scope=openid%20email&redirect_uri=' .
+//            urlencode($this->redirectUri);
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientId(): string
+    {
+        return $this->clientId;
+    }
+
+    /**
+     * @return AccessToken
+     * @throws KeycloakException
+     */
+    public function getAccessToken(): AccessToken
+    {
+        if (!isset($this->accessToken)) {
+            throw new KeycloakException('AccessToken is missing.');
+        }
+
+        return $this->accessToken;
+    }
+
+    /**
+     * @return RefreshToken
+     * @throws KeycloakException
+     */
+    public function getRefreshToken(): RefreshToken
+    {
+        if (!isset($this->refreshToken)) {
+            throw new KeycloakException('RefreshToken is missing.');
+        }
+
+        return $this->refreshToken;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getClientSecret(): ?string
+    {
+        return $this->clientSecret;
+    }
+
 }

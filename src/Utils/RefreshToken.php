@@ -20,8 +20,6 @@ namespace Joandysson\Keycloak\Utils;
  */
 class RefreshToken extends Token
 {
-    protected string $refreshToken;
-
     /**
      * RefreshToken constructor.
      * @param string $refreshToken
