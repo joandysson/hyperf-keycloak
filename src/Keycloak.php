@@ -58,6 +58,10 @@ class Keycloak
     /** @var RefreshToken */
     private RefreshToken $apiRefreshToken;
 
+
+    /** @var KeycloakAPI */
+    private KeycloakAPI $keycloakAPI;
+
     /**
      * @param string $host
      * @param string $clientId
@@ -298,6 +302,14 @@ class Keycloak
     public function getClientSecret(): ?string
     {
         return $this->clientSecret;
+    }
+
+    /**
+     * @return string
+     */
+    public function authorization(string $code): void
+    {
+        $this->accessToken = KeycloakAPI::getauthorization($this, $code);
     }
 
 }
