@@ -28,7 +28,7 @@ class ConfigProvider
                     'id' => 'config',
                     'description' => 'Configuration file to define your own configuration.',
                     'source' => __DIR__ . '/../publish/keycloak.php',
-                    'destination' => __DIR__ . '/config/autoload/keycloak.php',
+                    'destination' => BASE_PATH . '/config/autoload/keycloak.php',
                 ],
             ],
         ];
