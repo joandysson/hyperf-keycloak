@@ -1,16 +1,14 @@
 <?php
 
 declare(strict_types=1);
-
 /**
- * This file is part of Hyper Keycloak.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/joandysson
- * @document https://github.com/joandysson/hyperf-keycloak/blob/main/readme.md
- * @contact  @joandysson
- * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace Joandysson\Keycloak\Exceptions;
 
 class NotAuthorizedException extends \Exception

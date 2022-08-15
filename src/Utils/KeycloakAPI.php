@@ -1,324 +1,140 @@
 <?php
 
 declare(strict_types=1);
-
 /**
- * This file is part of Hyper Keycloak.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/joandysson
- * @document https://github.com/joandysson/hyperf-keycloak/blob/main/readme.md
- * @contact  @joandysson
- * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace Joandysson\Keycloak\Utils;
 
 use Joandysson\Keycloak\Exceptions\CurlException;
-use Joandysson\Keycloak\Exceptions\KeycloakException;
-use Joandysson\Keycloak\Keycloak;
-use Joandysson\Keycloak\KeycloakAdapterExtended;
 
 /**
- * Class KeycloakAPI
- * @package Easy\Utils
+ * Class KeycloakAPI.
  */
 class KeycloakAPI
 {
-    /**
-     * @param Keycloak $keycloak
-     * @param string $authorizationCode
-     * @return AuthorizationResponse
-     * @throws CurlException
-     * @throws KeycloakException
-     */
-    public static function getAuthorization(Keycloak $keycloak, string $authorizationCode): AuthorizationResponse
-    {
-        $request = [
-            'grant_type'   => 'authorization_code',
-            'code'         => $authorizationCode,
-            'client_id'    => $keycloak->clientId,
-            'redirect_uri' => $keycloak->getRedirectUri()
-        ];
-
-        $response = Curl::post('$keycloak->host/protocol/openid-connect/token', [
-            'Content-Type' => 'application/x-www-form-urlencoded'
-        ], $request);
-
-        if (isset($response->body->error)) {
-            throw new CurlException($response->body->error . ': ' . $response->body->error_description);
-        }
-
-        if (isset($response->body->access_token)) {
-            return new AuthorizationResponse($response->body);
-        }
-
-        throw new KeycloakException('???');
+    public function __construct(
+        private string $host,
+        private string $redirectUri,
+        private string $clientId,
+        private string $secret
+    ) {
     }
 
     /**
-     * @param Keycloak $keycloak
-     * @return AuthorizationResponse
+     * @param array $grantValue
+     * @return Response
      * @throws CurlException
-     * @throws KeycloakException
      */
-    public static function getApiAuthorization(Keycloak $keycloak): AuthorizationResponse
+    public function authorization(array $grantValue): Response
     {
-        $url = sprintf('%s/protocol/openid-connect/token', $keycloak->getHost());
+        $host = sprintf('%s/protocol/openid-connect/token', $this->host);
 
-        $response = Curl::post($url, [
-            'Content-Type' => 'application/x-www-form-urlencoded'
-        ], [
-            'grant_type'    => 'password',
-            'client_id'     => $keycloak->apiClientId,
-            'client_secret' => $keycloak->apiClientSecret,
-            'username'      => $keycloak->apiUsername,
-            'password'      => $keycloak->apiPassword
-        ]);
-
-        if (isset($response->body->error)) {
-            throw new CurlException($response->body->error . ': ' . $response->body->error_description);
-        }
-
-        if (isset($response->body->access_token)) {
-            return new AuthorizationResponse($response->body);
-        }
-
-        throw new KeycloakException('???');
-    }
-
-    /**
-     * @param KeycloakAdapterExtended $keycloak
-     * @param string           $username
-     * @param string           $firstname
-     * @param string           $lastname
-     * @param string           $email
-     * @param bool             $enabled
-     * @param array            $groups
-     * @param bool             $emailVerified
-     * @return bool
-     * @throws CurlException
-     */
-    public static function createUser(
-        Keycloak                $keycloak,
-        string                  $username,
-        string                  $firstname,
-        string                  $lastname,
-        string                  $email,
-        bool                    $enabled = true,
-        array                   $groups = ['default-group'],
-        bool                    $emailVerified = false
-    ): bool {
-        $request = [
-            'username'  => $username,
-            'firstName' => $firstname,
-            'lastName'  => $lastname,
-            'email'     => $email,
-            'enabled'   => $enabled,
-            'groups'    => $groups
-        ];
-        if ($emailVerified) {
-            $request['emailVerified'] = true;
-        }
-
-        $url = sprintf('%s/users', $keycloak->getHost());
-        $response = Curl::post($url, [
-            'Content-Type'  => 'application/json',
-            'Authorization' => 'Bearer ' . $keycloak->apiAccessToken->bearer
-        ], $request);
-
-        if ($response->code == 201) {
-            return true;
-        }
-
-        throw new CurlException('User creation failed. HTTP response code: $response->code');
-    }
-
-    /**
-     * @param KeycloakAdapter $keycloak
-     * @param RefreshToken $userRefreshToken
-     * @return AuthorizationResponse
-     * @throws CurlException
-     * @throws KeycloakException
-     */
-    public static function reauthorize(Keycloak $keycloak, RefreshToken $userRefreshToken): AuthorizationResponse
-    {
-        $response = Curl::post('$keycloak->host/protocol/openid-connect/token', [
-            'Content-Type' => 'application/x-www-form-urlencoded'
-        ], [
-            'grant_type'    => 'refresh_token',
-            'refresh_token' => $userRefreshToken->refreshToken,
-            'client_id'     => $keycloak->clientId,
-            'client_secret' => $keycloak->clientSecret,
-            'redirect_uri'  => $keycloak->getRedirectUri()
-        ]);
-
-        if (isset($response->body->error)) {
-            throw new CurlException($response->body->error . ': ' . $response->body->error_description ?? 'no error description');
-        }
-
-        if (isset($response->body->access_token)) {
-            return new AuthorizationResponse($response->body);
-        }
-
-        throw new KeycloakException('Unknown error');
-    }
-
-    /**
-     * @param Keycloak     $keycloak
-     * @param RefreshToken $userRefreshToken
-     * @return bool
-     * @throws CurlException
-     */
-    public static function logout(Keycloak $keycloak, RefreshToken $userRefreshToken): bool
-    {
-        $data = [
-            'refresh_token' => $userRefreshToken->refreshToken,
-            'client_id'     => $keycloak->clientId
-        ];
-
-        if (!empty($keycloak->clientSecret)) {
-            $data['client_secret'] = $keycloak->clientSecret;
-        }
-
-        $response = Curl::post('$keycloak->host/protocol/openid-connect/logout', [
-            'Content-Type' => 'application/x-www-form-urlencoded'
-        ], $data);
-
-        if ($response->code == 200 || $response->code == 204) {
-            return true;
-        }
-
-        if (isset($response->body->error)) {
-            throw new CurlException('HTTP $response->code: ' . $response->body->error . ': ' .
-                $response->body->error_description);
-        } else {
-            throw new CurlException('HTTP $response->code: ' . $response->error);
-        }
-    }
-
-    /**
-     * @throws CurlException
-     */
-    public static function userExists(Keycloak $keycloak, string $email): bool
-    {
-        $url = sprintf('%s/users?email=%s', $keycloak->getHost(), urlencode($email));
-        $response = Curl::get($url, [
-            'Authorization' => 'Bearer ' . $keycloak->apiAccessToken->bearer
-        ]);
-
-        if (is_array($response->body)) {
-            foreach ($response->body as $user) {
-                if ((isset($user->username)) && ($email == $user->username) ||
-                    (isset($user->email)) && ($email == $user->email)
-                ) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @throws CurlException
-     */
-    public static function getUsernameByEmail(Keycloak $keycloak, string $email): ?string
-    {
-        $url = sprintf('%s/users?email=%s', $keycloak->getHost(), urlencode($email));
-        $response = Curl::get($url, [
-            'Authorization' => 'Bearer ' . $keycloak->apiAccessToken->bearer
-        ]);
-
-        return (isset($response->body[0]->username) && isset($response->body[0]->email) &&
-            ($email == $response->body[0]->email)) ? $response->body[0]->username : null;
-    }
-
-    /**
-     * @param KeycloakAdapterExtended $keycloak
-     * @param string           $keycloakId
-     * @param string           $password
-     * @param bool             $temporary
-     * @return bool
-     * @throws CurlException
-     */
-    public static function setPassword(
-        Keycloak                $keycloak,
-        string                  $keycloakId,
-        string                  $password,
-        bool                    $temporary = false
-    ): bool
-    {
-        $url = sprintf('%s/users/%s/reset-password',$keycloak->getHost(), $keycloakId);
-
-        $response = Curl::put($url, [
-                'Content-Type'  => 'application/json',
-                'Authorization' => 'Bearer ' . $keycloak->apiAccessToken->bearer,
-            ],
-            [
-                'temporary' => $temporary,
-                'type'      => 'password',
-                'value'     => $password
-            ]
+        return Curl::post(
+            $host,
+            $this->getHeaders(),
+            $this->formAuthorization($grantValue)
         );
-
-        if ($response->code == 204) {
-            return true;
-        }
-
-        if (isset($response->body->error)) {
-            throw new CurlException('HTTP $response->code: ' . $response->body->error . ': ' .
-                $response->body->error_description);
-        } else {
-            throw new CurlException('HTTP $response->code: ' . $response->error);
-        }
     }
 
     /**
-     * @param Keycloak $keycloak
-     * @param string $username
-     * @param string $password
+     * @param array $data
+     * @return Response
      * @throws CurlException
      */
-   public static function logIn(
-       Keycloak        $keycloak,
-       string          $username,
-       string          $password
-   ) {
-       $response = Curl::post('$keycloak->host/protocol/openid-connect/token', [
-           'Content-Type' => 'application/x-www-form-urlencoded',
-       ], [
-           'grant_type'    => 'password',
-           'client_id'     => $keycloak->clientId,
-           'client_secret' => $keycloak->clientSecret,
-           'username'      => $username,
-           'password'      => $password,
-           'scope'         => 'openid'
-       ]);
+    public function introspect(array $data): Response
+    {
+        return Curl::post(
+            $this->endpoint('/protocol/openid-connect/token/introspect'),
+            $this->getHeaders(),
+            $this->formIntrospect($data)
+        );
+    }
 
-       if ($response->code == 200) {
-           $response = new AuthorizationResponse($response->body);
+    /**
+     * @param string $refreshToken
+     * @return Response
+     * @throws CurlException
+     */
+    public function logout(string $refreshToken): Response
+    {
+        return Curl::post(
+            $this->endpoint('/protocol/openid-connect/logout'),
+            $this->getHeaders(),
+            $this->formLogout($refreshToken)
+        );
+    }
 
-           return $response;
-       }
-
-       if (isset($response->body->error)) {
-           $error = sprintf('HTTP %s: %s : %s',
-               $response->code,
-               $response->body->error,
-               $response->body->error_description
-           );
-
-           throw new CurlException($error);
-       }
-
-       $error = sprintf('HTTP %s: %s', $response->code, $response->error);
-       throw new CurlException($error);
-   }
-
-    public function bearerAuthorization(string $token): array
+    /**
+     * @return string[]
+     */
+    private function getHeaders(): array
     {
         return [
-            'Authorization' => sprintf('Bearer %s', $token)
+            'Content-Type' => 'application/x-www-form-urlencoded',
+            // 'Authorization' => 'Bearer ' . $this->apiAccessToken->bearer
         ];
+    }
+
+    /**
+     * @param array $grantValue
+     * @return array
+     */
+    private function formAuthorization(array $grantValue): array
+    {
+        return array_merge(
+            $grantValue,
+            $this->clientCredentials(),
+            [
+                'redirect_uri' => $this->redirectUri,
+            ]
+        );
+    }
+
+    /**
+     * @param string $refreshToken
+     * @return array
+     */
+    private function formLogout(string $refreshToken): array
+    {
+        return array_merge([
+                'refresh_token' => $refreshToken,
+            ],
+            $this->clientCredentials()
+        );
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    private function formIntrospect(array $data): array
+    {
+        return array_merge($data, $this->clientCredentials());
+    }
+
+    /**
+     * @return array
+     */
+    private function clientCredentials(): array
+    {
+        return [
+            'client_id' => $this->clientId,
+            'client_secret' => $this->secret,
+        ];
+    }
+
+    /**
+     * @param string $uri
+     * @return string
+     */
+    private function endpoint(string $uri): string
+    {
+        return sprintf('%s%s', $this->host, $uri);
     }
 }

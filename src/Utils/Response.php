@@ -1,72 +1,42 @@
 <?php
 
 declare(strict_types=1);
-
 /**
- * This file is part of Hyper Keycloak.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/joandysson
- * @document https://github.com/joandysson/hyperf-keycloak/blob/main/readme.md
- * @contact  @joandysson
- * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace Joandysson\Keycloak\Utils;
 
 /**
- * Class Response
- * @package Easy\Utils
- * @property-read \stdClass $body
- * @property-read mixed     $error
- * @property-read int       $code
+ * Class Response.
  */
 class Response
 {
-    /** @var int */
     protected int $code;
 
-    /**
-     * @var mixed|null
-     */
+    protected ?array $body;
 
-    protected mixed $body;
     /**
-     * @var mixed|null
+     * @var null|mixed
      */
     protected mixed $error;
 
-    /**
-     * @param int $code
-     * @param $body
-     * @param $error
-     */
-    public function __construct(int $code, $body = null, $error = null)
+    public function __construct(int $code, ?array $body = null)
     {
         $this->body = $body;
         $this->code = $code;
-        $this->error = $error;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getBody(): mixed
+    public function body(): ?array
     {
         return $this->body;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getError(): mixed
-    {
-        return $this->error;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCode(): int
+    public function code(): int
     {
         return $this->code;
     }

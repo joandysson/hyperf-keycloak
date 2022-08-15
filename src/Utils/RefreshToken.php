@@ -1,29 +1,24 @@
 <?php
 
 declare(strict_types=1);
-
 /**
- * This file is part of Hyper Keycloak.
+ * This file is part of Hyperf.
  *
- * @link     https://github.com/joandysson
- * @document https://github.com/joandysson/hyperf-keycloak/blob/main/readme.md
- * @contact  @joandysson
- * @license  https://github.com/joandysson/hyperf-keycloak/blob/main/LICENSE
+ * @link     https://www.hyperf.io
+ * @document https://hyperf.wiki
+ * @contact  group@hyperf.io
+ * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-
 namespace Joandysson\Keycloak\Utils;
 
 /**
- * Class RefreshToken
- * @package Easy\Utils
- * @property-read string $refreshToken
+ * Class RefreshToken.
+ * @property string $refreshToken
  */
 class RefreshToken extends Token
 {
     /**
      * RefreshToken constructor.
-     * @param string $refreshToken
-     * @param int    $expiresIn
      */
     public function __construct(string $refreshToken, int $expiresIn)
     {
@@ -31,9 +26,6 @@ class RefreshToken extends Token
         $this->refreshToken = $refreshToken;
     }
 
-    /**
-     * @return string
-     */
     public function getRefreshToken(): string
     {
         return $this->refreshToken;
