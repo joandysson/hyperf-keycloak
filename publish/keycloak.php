@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @contact  @jaineccs
  * @license  https://github.com/jainec/hyperf-fakie/blob/master/LICENSE
  */
+
 return [
-    'oidc_url' => 'http://localhost:8080/auth',
-    'oidc_client_id' => 'admin-cli',
-    'oidc_client_secret' => 'admin',
-    'oidc_username' => 'admin',
-    'oidc_password' => 'admin',
-    'oidc_callback_url' => 'http://localhost:8080/auth/callback',
+    'oidc_host' => 'http://localhost/realms/<your-realm>', // The host of your Keycloak server
+    'oidc_client_id' => 'client', // client id
+    'oidc_client_secret' => 'scret', // client secret
+    'oidc_redirect_url' => 'http://localhost/callback', // callback url
+    'oidc_scope' => 'openid', // global scope
 ];

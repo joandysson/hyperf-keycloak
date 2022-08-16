@@ -19,7 +19,7 @@
     "php": ">= 8.0",
     "ext-curl": "*",
     "ext-json": "*",
-    "hyperf/contract": "^2.2"
+    "hyperf/config": "^2.2"
   },
   "require-dev": {
     "hyperf/testing": "~2.2.0",

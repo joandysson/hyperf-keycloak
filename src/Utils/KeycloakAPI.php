@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak\Utils;
 
+use Joandysson\Keycloak\AdapterConfig;
 use Joandysson\Keycloak\Exceptions\CurlException;
 
 /**
@@ -18,12 +19,7 @@ use Joandysson\Keycloak\Exceptions\CurlException;
  */
 class KeycloakAPI
 {
-    public function __construct(
-        private string $host,
-        private string $redirectUri,
-        private string $clientId,
-        private string $secret
-    ) {
+    public function __construct(private AdapterConfig $config) {
     }
 
     /**
@@ -33,7 +29,7 @@ class KeycloakAPI
      */
     public function authorization(array $grantValue): Response
     {
-        $host = sprintf('%s/protocol/openid-connect/token', $this->host);
+        $host = sprintf('%s/protocol/openid-connect/token', $this->config->host());
 
         return Curl::post(
             $host,
@@ -91,7 +87,7 @@ class KeycloakAPI
             $grantValue,
             $this->clientCredentials(),
             [
-                'redirect_uri' => $this->redirectUri,
+                'redirect_uri' => $this->config->redirectUri(),
             ]
         );
     }
@@ -124,8 +120,8 @@ class KeycloakAPI
     private function clientCredentials(): array
     {
         return [
-            'client_id' => $this->clientId,
-            'client_secret' => $this->secret,
+            'client_id' => $this->config->clientId(),
+            'client_secret' => $this->config->secret(),
         ];
     }
 
@@ -135,6 +131,6 @@ class KeycloakAPI
      */
     private function endpoint(string $uri): string
     {
-        return sprintf('%s%s', $this->host, $uri);
+        return sprintf('%s%s', $this->config->host(), $uri);
     }
 }

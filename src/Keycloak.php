@@ -13,11 +13,8 @@ namespace Joandysson\Keycloak;
 
 use Joandysson\Keycloak\Exceptions\CurlException;
 use Joandysson\Keycloak\Exceptions\KeycloakException;
-use Joandysson\Keycloak\Utils\AccessToken;
 use Joandysson\Keycloak\Utils\KeycloakAPI;
-use Joandysson\Keycloak\Utils\RefreshToken;
 use Joandysson\Keycloak\Utils\Response;
-
 /**
  * Class Keycloak.
  */
@@ -27,22 +24,19 @@ class Keycloak
 
     private KeycloakAPI $keycloakAPI;
 
+    private AdapterConfig $config;
+
+    private string $scope;
+
+    private string $state;
+
     /**
      * @throws KeycloakException
      */
-    public function __construct(
-        private string $host,
-        private string $clientId,
-        private string $clientSecret,
-        private string $redirectUri,
-        private string $scopes = '',
-        private ?string $state = null
-    ) {
-        if (! filter_var($this->redirectUri, FILTER_VALIDATE_URL)) {
-            throw new KeycloakException('Invalid redirect Uri');
-        }
-
-        $this->keycloakAPI = new KeycloakAPI($this->host, $this->redirectUri, $this->clientId, $this->clientSecret);
+    public function __construct() {
+        /** @var AdapterConfig */
+        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
+        $this->keycloakAPI = new KeycloakAPI($this->config);
     }
 
     /**
@@ -55,19 +49,6 @@ class Keycloak
         $this->state = $state;
     }
 
-    public function hasApiAccessTokenExpired(): bool
-    {
-        if (! isset($_SESSION['auth']['api_access_token']['expiration'])) {
-            return true;
-        }
-
-        if ($_SESSION['auth']['api_access_token']['expiration'] < time()) {
-            return true;
-        }
-
-        return false;
-    }
-
     public function getRedirectUri(): string
     {
         return $this->redirectUri;
@@ -75,19 +56,19 @@ class Keycloak
 
     public function getHost(): string
     {
-        return $this->host;
+        return $this->config->host();
     }
 
-    public function setScopes(string $scopes): void
+    public function setScope(string $scope): void
     {
-        $this->scopes = $scopes;
+        $this->scope = $scope;
     }
 
     public function getLoginUrl(): string
     {
         return sprintf(
             '%s/protocol/openid-connect/auth?%s',
-            $this->host,
+            $this->config->host(),
             $this->parameters()
         );
     }
@@ -104,47 +85,23 @@ class Keycloak
     {
         return sprintf(
             '%s/clients-registrations/openid-connect?%s',
-            $this->host,
+            $this->config->host(),
             $this->parameters()
         );
 
 //        TODO: to watch after
-//        return '$this->host/protocol/openid-connect/registrations?client_id=$this->clientId&response_type=code&scope=openid%20email&redirect_uri=' .
+//        return '$this->config->host()/protocol/openid-connect/registrations?client_id=$this->config->clientId()&response_type=code&scope=openid%20email&redirect_uri=' .
 //            urlencode($this->redirectUri);
     }
 
     public function getClientId(): string
     {
-        return $this->clientId;
-    }
-
-    /**
-     * @throws KeycloakException
-     */
-    public function getAccessToken(): AccessToken
-    {
-        if (! isset($this->accessToken)) {
-            throw new KeycloakException('AccessToken is missing.');
-        }
-
-        return $this->accessToken;
-    }
-
-    /**
-     * @throws KeycloakException
-     */
-    public function getRefreshToken(): RefreshToken
-    {
-        if (! isset($this->refreshToken)) {
-            throw new KeycloakException('RefreshToken is missing.');
-        }
-
-        return $this->refreshToken;
+        return $this->config->clientId();
     }
 
     public function getClientSecret(): ?string
     {
-        return $this->clientSecret;
+        return $this->config->secret();
     }
 
     /**
@@ -179,7 +136,7 @@ class Keycloak
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::PASSWORD, [
             'username' => $username,
             'password' => $password,
-            'scope' => $this->scopes,
+            'scope' => $this->scope,
         ]);
 
         return $this->keycloakAPI->authorization($grantTypeValue);
@@ -192,7 +149,7 @@ class Keycloak
     public function authorizationClientCredentials(): Response
     {
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::CLIENT_CREDENTIALS, [
-            'scope' => $this->scopes,
+            'scope' => $this->scope,
         ]);
 
         return $this->keycloakAPI->authorization($grantTypeValue);
@@ -212,13 +169,13 @@ class Keycloak
     private function parameters(): string
     {
         $parameters = [
-            'client_id' => $this->clientId,
+            'client_id' => $this->config->clientId(),
             'response_type' => 'code',
-            'redirect_uri' => $this->redirectUri,
+            'redirect_uri' => $this->config->redirectUri(),
         ];
 
         $parameters = $this->addState($parameters);
-        $parameters = $this->addScopes($parameters);
+        $parameters = $this->addScope($parameters);
 
         return http_build_query($parameters, '', null, PHP_QUERY_RFC3986);
     }
@@ -234,11 +191,13 @@ class Keycloak
         return $parameters;
     }
 
-    private function addScopes(array $parameters): array
+    private function addScope(array $parameters): array
     {
-        if (! empty($this->scopes)) {
+        $scope = sprintf('%s %s', $this->config->scope(), $this->scope);
+
+        if (! empty($this->scope)) {
             return array_merge($parameters, [
-                'scope' => $this->scopes,
+                'scope' => $scope,
             ]);
         }
 
