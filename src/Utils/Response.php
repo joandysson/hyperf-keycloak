@@ -16,19 +16,18 @@ namespace Joandysson\Keycloak\Utils;
  */
 class Response
 {
-    protected int $code;
-
-    protected ?array $body;
-
-    /**
-     * @var null|mixed
-     */
-    protected mixed $error;
-
-    public function __construct(int $code, ?array $body = null)
-    {
+    public function __construct(
+        private array $header,
+        private array $body,
+        private int $code
+    ){
         $this->body = $body;
         $this->code = $code;
+    }
+
+    public function header(): ?array
+    {
+        return $this->header();
     }
 
     public function body(): ?array

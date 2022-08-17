@@ -89,7 +89,7 @@ class Curl
         return curl_error(self::$ch);
     }
 
-    private static function getInfo(): mixed
+    private static function getCode(): int
     {
         return curl_getinfo(self::$ch, CURLINFO_HTTP_CODE);
     }
@@ -125,11 +125,9 @@ class Curl
             throw new CurlException(sprintf('Curl Error: %s', $error));
         }
 
-        $httpCode = self::getInfo();
-
         self::close();
 
-        return new Response($httpCode, json_decode($response, true));
+        return new Response([], json_decode($response, true) ?? [], self::getCode());
     }
 
     private static function formatHeaders(array $headers): array
