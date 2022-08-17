@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of Hyperf Keycloak.
  *
  * @link     https://www.hyperf.io
  * @document https://hyperf.wiki
@@ -19,12 +19,11 @@ use Joandysson\Keycloak\Exceptions\CurlException;
  */
 class KeycloakAPI
 {
-    public function __construct(private AdapterConfig $config) {
+    public function __construct(private AdapterConfig $config)
+    {
     }
 
     /**
-     * @param array $grantValue
-     * @return Response
      * @throws CurlException
      */
     public function authorization(array $grantValue): Response
@@ -39,8 +38,6 @@ class KeycloakAPI
     }
 
     /**
-     * @param array $data
-     * @return Response
      * @throws CurlException
      */
     public function introspect(array $data): Response
@@ -53,8 +50,6 @@ class KeycloakAPI
     }
 
     /**
-     * @param string $refreshToken
-     * @return Response
      * @throws CurlException
      */
     public function logout(string $refreshToken): Response
@@ -77,10 +72,6 @@ class KeycloakAPI
         ];
     }
 
-    /**
-     * @param array $grantValue
-     * @return array
-     */
     private function formAuthorization(array $grantValue): array
     {
         return array_merge(
@@ -92,31 +83,21 @@ class KeycloakAPI
         );
     }
 
-    /**
-     * @param string $refreshToken
-     * @return array
-     */
     private function formLogout(string $refreshToken): array
     {
-        return array_merge([
+        return array_merge(
+            [
                 'refresh_token' => $refreshToken,
             ],
             $this->clientCredentials()
         );
     }
 
-    /**
-     * @param array $data
-     * @return array
-     */
     private function formIntrospect(array $data): array
     {
         return array_merge($data, $this->clientCredentials());
     }
 
-    /**
-     * @return array
-     */
     private function clientCredentials(): array
     {
         return [
@@ -125,10 +106,6 @@ class KeycloakAPI
         ];
     }
 
-    /**
-     * @param string $uri
-     * @return string
-     */
     private function endpoint(string $uri): string
     {
         return sprintf('%s%s', $this->config->host(), $uri);

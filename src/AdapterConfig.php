@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of Hyperf Keycloak.
  *
  * @link     https://www.hyperf.io
  * @document https://hyperf.wiki
@@ -19,11 +19,10 @@ use Joandysson\Keycloak\Exceptions\KeycloakException;
  */
 class AdapterConfig
 {
-    public function __construct(private string $oidcConfig){
-        /** @var ConfigInterface */
-        $config = make(ConfigInterface::class);
-        $config->get($this->oidcConfig);
-
+    public function __construct(
+        private string $oidcConfig,
+        private ConfigInterface $config
+    ) {
         if (! filter_var($this->redirectUri(), FILTER_VALIDATE_URL)) {
             throw new KeycloakException('Invalid redirect Uri');
         }

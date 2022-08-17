@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of Hyperf Keycloak.
  *
  * @link     https://www.hyperf.io
  * @document https://hyperf.wiki
@@ -15,6 +15,7 @@ use Joandysson\Keycloak\Exceptions\CurlException;
 use Joandysson\Keycloak\Exceptions\KeycloakException;
 use Joandysson\Keycloak\Utils\KeycloakAPI;
 use Joandysson\Keycloak\Utils\Response;
+
 /**
  * Class Keycloak.
  */
@@ -33,8 +34,9 @@ class Keycloak
     /**
      * @throws KeycloakException
      */
-    public function __construct() {
-        /** @var AdapterConfig */
+    public function __construct()
+    {
+        /* @var AdapterConfig */
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->keycloakAPI = new KeycloakAPI($this->config);
     }
@@ -51,7 +53,7 @@ class Keycloak
 
     public function getRedirectUri(): string
     {
-        return $this->redirectUri;
+        return $this->config->redirectUri();
     }
 
     public function getHost(): string
@@ -143,7 +145,6 @@ class Keycloak
     }
 
     /**
-     * @return Response
      * @throws CurlException
      */
     public function authorizationClientCredentials(): Response
