@@ -191,14 +191,14 @@ class Keycloak
 
         return $parameters;
     }
-
     private function addScope(array $parameters): array
     {
-        if (empty($this->scope) && empty($scope)) {
-            return [];
+        if (empty($this->scope) && empty($this->config->scope())) {
+            return $parameters;
         }
 
         $scope = sprintf('%s %s', $this->config->scope(), $this->scope);
+
         return array_merge($parameters, ['scope' => $scope]);
     }
 
