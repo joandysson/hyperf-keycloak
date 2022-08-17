@@ -194,15 +194,12 @@ class Keycloak
 
     private function addScope(array $parameters): array
     {
-        $scope = sprintf('%s %s', $this->config->scope(), $this->scope);
-
-        if (! empty($this->scope)) {
-            return array_merge($parameters, [
-                'scope' => $scope,
-            ]);
+        if (empty($this->scope) && empty($scope)) {
+            return [];
         }
 
-        return $parameters;
+        $scope = sprintf('%s %s', $this->config->scope(), $this->scope);
+        return array_merge($parameters, ['scope' => $scope]);
     }
 
     private function prepareGrantTypeValue(string $grantType, array $grantValue): array
