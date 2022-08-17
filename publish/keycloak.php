@@ -10,9 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
-    'oidc_host' => 'http://localhost/realms/<your-realm>', // The host of your Keycloak server
-    'oidc_client_id' => 'client', // client id
-    'oidc_client_secret' => 'scret', // client secret
-    'oidc_redirect_url' => 'http://localhost/callback', // callback url
+    'oidc_host' => env('OIDC_HOST'), // The host of your Keycloak server
+    'oidc_client_id' => env('OIDC_CLIENT_ID'), // client id
+    'oidc_client_secret' => env('OIDC_CLIENT_SECRET'), // client secret
+    'oidc_redirect_url' => env('OIDC_REDIRECT_URL'), // callback url
     'oidc_scope' => 'openid', // global scope
 ];

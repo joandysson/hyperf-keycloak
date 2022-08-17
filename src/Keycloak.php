@@ -27,9 +27,9 @@ class Keycloak
 
     private AdapterConfig $config;
 
-    private string $scope;
+    private string $scope = '';
 
-    private string $state;
+    private string $state = '';
 
     /**
      * @throws KeycloakException
