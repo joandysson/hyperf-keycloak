@@ -39,6 +39,7 @@ class Keycloak
         /* @var AdapterConfig */
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->keycloakAPI = new KeycloakAPI($this->config);
+        $this->scope = $this->config->scope();
     }
 
     /**
@@ -63,7 +64,7 @@ class Keycloak
 
     public function setScope(string $scope): void
     {
-        $this->scope = $scope;
+        $this->scope = sprintf('%s %s', $this->config->scope(), $scope);
     }
 
     public function getLoginUrl(): string
@@ -193,13 +194,11 @@ class Keycloak
     }
     private function addScope(array $parameters): array
     {
-        if (empty($this->scope) && empty($this->config->scope())) {
+        if (empty($this->scope)) {
             return $parameters;
         }
 
-        $scope = sprintf('%s %s', $this->config->scope(), $this->scope);
-
-        return array_merge($parameters, ['scope' => $scope]);
+        return array_merge($parameters, ['scope' => $this->scope]);
     }
 
     private function prepareGrantTypeValue(string $grantType, array $grantValue): array
