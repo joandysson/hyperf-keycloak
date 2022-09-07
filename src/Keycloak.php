@@ -31,7 +31,7 @@ class Keycloak
     public function __construct()
     {
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
-        $this->keycloakAPI = make(KeycloakAPI::class);
+        $this->keycloakAPI = make(KeycloakAPI::class, ['config' => $this->config]);
         $this->scope = $this->config->scope();
     }
 
