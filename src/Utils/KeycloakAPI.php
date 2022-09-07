@@ -40,7 +40,7 @@ class KeycloakAPI
     {
         return $this->client->post('/protocol/openid-connect/token', [
             'headers' => $this->getHeaders(),
-            'form_parameters' => $this->formAuthorization($grantValue),
+            'form_params' => $this->formAuthorization($grantValue),
         ]);
     }
 
@@ -51,7 +51,7 @@ class KeycloakAPI
     {
         return $this->client->post('/protocol/openid-connect/token/introspect', [
             'headers' => $this->getHeaders(),
-            'form_parameters' => $this->formIntrospect($data),
+            'form_params' => $this->formIntrospect($data),
         ]);
     }
 
@@ -62,7 +62,7 @@ class KeycloakAPI
     {
         return $this->client->post('/protocol/openid-connect/logout', [
             'headers' => $this->getHeaders(),
-            'form_parameters' => $this->formLogout($refreshToken),
+            'form_params' => $this->formLogout($refreshToken),
         ]);
     }
 
