@@ -21,11 +21,12 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AccountAPI
 {
+    private AdapterConfig $config;
+
     /**
-     * @param AdapterConfig $config
      * @param Client $client
      */
-    public function __construct(private AdapterConfig $config, private Client $client)
+    public function __construct(private Client $client)
     {
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->client = make(Client::class, [
