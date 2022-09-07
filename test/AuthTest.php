@@ -22,29 +22,15 @@ use PHPUnit\Framework\TestCase;
  */
 class AuthTest extends TestCase
 {
-//    public function testOne(): void
-//    {
-////        $key = new KeycloakAdapter([
-////            'host' => 'tes', 'realmId' => 'test', 'clientId' => 'test', 'redirectUri' => 11
-////        ]);
-////
-////        print_r($key->getLoginUrl());
-//
-//        $this->assertEquals(1, 1);
-//    }
-
-    public function testGuzzle(): void
+    public function testOne(): void
     {
-        $options = [
-            'base_uri' => 'http://opss.com:8000/casa/nova',
-            'timeout' => '2'
-        ];
+//        $key = new KeycloakAdapter([
+//            'host' => 'tes', 'realmId' => 'test', 'clientId' => 'test', 'redirectUri' => 11
+//        ]);
+//
+//        print_r($key->getLoginUrl());
 
-        $ops = new Client($options);
-
-        $data = $ops->get('oss');
-
-        echo print_r($data);
         $this->assertEquals(1, 1);
     }
+
 }

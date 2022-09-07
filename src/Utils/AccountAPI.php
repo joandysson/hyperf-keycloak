@@ -34,6 +34,8 @@ class AccountAPI
     }
 
     /**
+     * @param string $token
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function getUser(string $token): ResponseInterface
@@ -44,6 +46,9 @@ class AccountAPI
     }
 
     /**
+     * @param string $token
+     * @param array $data
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function update(string $token, array $data): ResponseInterface
@@ -54,6 +59,10 @@ class AccountAPI
         ]);
     }
 
+    /**
+     * @param string $token
+     * @return array
+     */
     private function getHeaders(string $token): array
     {
         return [
