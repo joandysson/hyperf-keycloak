@@ -39,7 +39,7 @@ class KeycloakAPI
      */
     public function authorization(array $grantValue): ResponseInterface
     {
-        return $this->client->post('/protocol/openid-connect/token', [
+        return $this->client->post($this->path('/protocol/openid-connect/token'), [
             'headers' => $this->getHeaders(),
             'form_params' => $this->formAuthorization($grantValue),
         ]);
@@ -52,7 +52,7 @@ class KeycloakAPI
      */
     public function introspect(array $data): ResponseInterface
     {
-        return $this->client->post('/protocol/openid-connect/token/introspect', [
+        return $this->client->post($this->path('/protocol/openid-connect/token/introspect'),[
             'headers' => $this->getHeaders(),
             'form_params' => $this->formIntrospect($data),
         ]);
@@ -65,7 +65,7 @@ class KeycloakAPI
      */
     public function logout(string $refreshToken): ResponseInterface
     {
-        return $this->client->post('/protocol/openid-connect/logout', [
+        return $this->client->post($this->path('/protocol/openid-connect/logout'), [
             'headers' => $this->getHeaders(),
             'form_params' => $this->formLogout($refreshToken),
         ]);
@@ -136,5 +136,10 @@ class KeycloakAPI
             'base_uri' => $this->config->host(),
             'timeout' => $this->config->timeout(),
         ];
+    }
+
+    private function path(string $path): string
+    {
+        return sprintf('/realms/%s%s', $this->config->clientId(), $path);
     }
 }
