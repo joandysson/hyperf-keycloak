@@ -19,6 +19,9 @@ use Joandysson\Keycloak\Exceptions\CurlException;
  */
 class KeycloakAPI
 {
+    /**
+     * @param AdapterConfig $config
+     */
     public function __construct(private AdapterConfig $config)
     {
     }

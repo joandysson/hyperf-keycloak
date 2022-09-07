@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak\Exceptions;
 
-class NotAuthenticatedException extends \Exception
+use Exception;
+
+class NotAuthenticatedException extends Exception
 {
 }

@@ -16,18 +16,21 @@ namespace Joandysson\Keycloak\Utils;
  */
 class Response
 {
+    /**
+     * @param array $header
+     * @param array $body
+     * @param int $code
+     */
     public function __construct(
         private array $header,
         private array $body,
         private int $code
-    ){
-        $this->body = $body;
-        $this->code = $code;
+    ) {
     }
 
     public function header(): ?array
     {
-        return $this->header();
+        return $this->header;
     }
 
     public function body(): ?array

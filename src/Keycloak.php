@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Joandysson\Keycloak;
 
 use Joandysson\Keycloak\Exceptions\CurlException;
-use Joandysson\Keycloak\Exceptions\KeycloakException;
 use Joandysson\Keycloak\Utils\KeycloakAPI;
 use Joandysson\Keycloak\Utils\Response;
 
@@ -31,12 +30,8 @@ class Keycloak
 
     private string $state = '';
 
-    /**
-     * @throws KeycloakException
-     */
     public function __construct()
     {
-        /* @var AdapterConfig */
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->keycloakAPI = new KeycloakAPI($this->config);
         $this->scope = $this->config->scope();
@@ -82,19 +77,6 @@ class Keycloak
     public function logout(string $refreshToken): Response
     {
         return $this->keycloakAPI->logout($refreshToken);
-    }
-
-    public function getRegistrationUrl(): string
-    {
-        return sprintf(
-            '%s/clients-registrations/openid-connect?%s',
-            $this->config->host(),
-            $this->parameters()
-        );
-
-//        TODO: to watch after
-//        return '$this->config->host()/protocol/openid-connect/registrations?client_id=$this->config->clientId()&response_type=code&scope=openid%20email&redirect_uri=' .
-//            urlencode($this->redirectUri);
     }
 
     public function getClientId(): string
@@ -159,6 +141,7 @@ class Keycloak
 
     /**
      * @throws CurlException
+     * @return Response
      */
     public function introspect(string $token, string $username): Utils\Response
     {
@@ -192,6 +175,7 @@ class Keycloak
 
         return $parameters;
     }
+
     private function addScope(array $parameters): array
     {
         if (empty($this->scope)) {

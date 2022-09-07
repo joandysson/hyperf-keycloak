@@ -19,6 +19,11 @@ use Joandysson\Keycloak\Exceptions\KeycloakException;
  */
 class AdapterConfig
 {
+    /**
+     * @param string $oidcConfig
+     * @param ConfigInterface $config
+     * @throws KeycloakException
+     */
     public function __construct(
         private string $oidcConfig,
         private ConfigInterface $config
@@ -53,6 +58,9 @@ class AdapterConfig
         return $this->config->get($this->key('oidc_scope'));
     }
 
+    /**
+     * @param $key
+     */
     private function key($key): string
     {
         return sprintf('%s.%s', $this->oidcConfig, $key);

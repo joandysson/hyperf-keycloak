@@ -26,7 +26,6 @@ abstract class Token
      */
     public function __construct(protected int $expiration)
     {
-        $this->expiration = $expiration;
     }
 
     public function getExpiration(): int

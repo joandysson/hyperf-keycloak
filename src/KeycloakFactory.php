@@ -14,6 +14,9 @@ namespace Joandysson\Keycloak;
 use Hyperf\Contract\ConfigInterface;
 use Psr\Container\ContainerInterface;
 
+/**
+ * Class KeycloakFactory.
+ */
 class KeycloakFactory
 {
     public function __construct(private ContainerInterface $container, private ConfigInterface $config)

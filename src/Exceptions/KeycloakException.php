@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak\Exceptions;
 
-class KeycloakException extends \Exception
+use Exception;
+
+class KeycloakException extends Exception
 {
 }

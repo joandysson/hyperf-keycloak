@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak;
 
+/**
+ * Class GrantTypes.
+ */
 class GrantTypes
 {
     public const AUTHORIZATION_CODE = 'authorization_code';
