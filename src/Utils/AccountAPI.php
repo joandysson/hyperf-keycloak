@@ -27,6 +27,7 @@ class AccountAPI
      */
     public function __construct(private AdapterConfig $config, private Client $client)
     {
+        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->client = make(Client::class, [
             'base_uri' => $this->config->host(),
             'timeout' => $this->config->timeout(),
