@@ -11,8 +11,10 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak\Utils;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Joandysson\Keycloak\AdapterConfig;
-use Joandysson\Keycloak\Exceptions\CurlException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class KeycloakAPI.
@@ -21,47 +23,47 @@ class KeycloakAPI
 {
     /**
      * @param AdapterConfig $config
+     * @param Client $client
      */
-    public function __construct(private AdapterConfig $config)
+    public function __construct(private AdapterConfig $config, private Client $client)
     {
+        $this->client = make(Client::class, [
+            'base_uri' => $this->config->host(),
+            'timeout' => $this->config->timeout(),
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function authorization(array $grantValue): Response
+    public function authorization(array $grantValue): ResponseInterface
     {
-        $host = sprintf('%s/protocol/openid-connect/token', $this->config->host());
-
-        return Curl::post(
-            $host,
-            $this->getHeaders(),
-            $this->formAuthorization($grantValue)
-        );
+        return $this->client->post('/protocol/openid-connect/token', [
+            'headers' => $this->getHeaders(),
+            'form_parameters' => $this->formAuthorization($grantValue),
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function introspect(array $data): Response
+    public function introspect(array $data): ResponseInterface
     {
-        return Curl::post(
-            $this->endpoint('/protocol/openid-connect/token/introspect'),
-            $this->getHeaders(),
-            $this->formIntrospect($data)
-        );
+        return $this->client->post('/protocol/openid-connect/token/introspect', [
+            'headers' => $this->getHeaders(),
+            'form_parameters' => $this->formIntrospect($data),
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function logout(string $refreshToken): Response
+    public function logout(string $refreshToken): ResponseInterface
     {
-        return Curl::post(
-            $this->endpoint('/protocol/openid-connect/logout'),
-            $this->getHeaders(),
-            $this->formLogout($refreshToken)
-        );
+        return $this->client->post('/protocol/openid-connect/logout', [
+            'headers' => $this->getHeaders(),
+            'form_parameters' => $this->formLogout($refreshToken),
+        ]);
     }
 
     /**
@@ -71,7 +73,6 @@ class KeycloakAPI
     {
         return [
             'Content-Type' => 'application/x-www-form-urlencoded',
-            // 'Authorization' => 'Bearer ' . $this->apiAccessToken->bearer
         ];
     }
 
@@ -107,10 +108,5 @@ class KeycloakAPI
             'client_id' => $this->config->clientId(),
             'client_secret' => $this->config->secret(),
         ];
-    }
-
-    private function endpoint(string $uri): string
-    {
-        return sprintf('%s%s', $this->config->host(), $uri);
     }
 }

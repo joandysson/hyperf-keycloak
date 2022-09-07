@@ -58,6 +58,11 @@ class AdapterConfig
         return $this->config->get($this->key('oidc_scope'));
     }
 
+    public function timeout(): string
+    {
+        return $this->config->get($this->key('oidc_timeout'));
+    }
+
     /**
      * @param $key
      */
