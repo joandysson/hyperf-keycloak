@@ -28,10 +28,7 @@ class AccountAPI
     public function __construct()
     {
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
-        $this->client = make(Client::class, [
-            'base_uri' => $this->config->host(),
-            'timeout' => $this->config->timeout(),
-        ]);
+        $this->client = make(Client::class, $this->config());
     }
 
     /**
@@ -71,4 +68,16 @@ class AccountAPI
             'Authorization' => sprintf('Bearer %s', $token),
         ];
     }
+
+    /**
+     * @return array
+     */
+    private function config(): array
+    {
+        return [
+            'base_uri' => $this->config->host(),
+            'timeout' => $this->config->timeout(),
+        ];
+    }
+
 }

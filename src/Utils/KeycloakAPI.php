@@ -21,11 +21,12 @@ use Psr\Http\Message\ResponseInterface;
  */
 class KeycloakAPI
 {
+    private Client $client;
+
     /**
      * @param AdapterConfig $config
-     * @param Client $client
      */
-    public function __construct(private AdapterConfig $config, private Client $client)
+    public function __construct(private AdapterConfig $config)
     {
         $this->client = make(Client::class, [
             'config' => $this->config()
