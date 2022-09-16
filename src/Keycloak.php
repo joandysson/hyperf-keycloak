@@ -12,7 +12,8 @@ declare(strict_types=1);
 namespace Joandysson\Keycloak;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Joandysson\Keycloak\Utils\KeycloakAPI;
+use Joandysson\Keycloak\Utils\GrantTypes;
+use Joandysson\Keycloak\Utils\OidcAPI;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -20,7 +21,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Keycloak
 {
-    private KeycloakAPI $keycloakAPI;
+    private OidcAPI $keycloakAPI;
 
     private AdapterConfig $config;
 
@@ -30,8 +31,8 @@ class Keycloak
 
     public function __construct()
     {
-        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
-        $this->keycloakAPI = make(KeycloakAPI::class, ['config' => $this->config]);
+        $this->config = make(AdapterConfig::class);
+        $this->keycloakAPI = make(OidcAPI::class, ['config' => $this->config]);
         $this->scope = $this->config->scope();
     }
 
@@ -45,21 +46,34 @@ class Keycloak
         $this->state = $state;
     }
 
+    /**
+     * @return string
+     */
     public function getRedirectUri(): string
     {
         return $this->config->redirectUri();
     }
 
+    /**
+     * @return string
+     */
     public function getHost(): string
     {
         return $this->config->host();
     }
 
+    /**
+     * @param string $scope
+     * @return void
+     */
     public function setScope(string $scope): void
     {
         $this->scope = sprintf('%s %s', $this->config->scope(), $scope);
     }
 
+    /**
+     * @return string
+     */
     public function getLoginUrl(): string
     {
         return sprintf(
@@ -82,6 +96,9 @@ class Keycloak
         return $this->config->clientId();
     }
 
+    /**
+     * @return string|null
+     */
     public function getClientSecret(): ?string
     {
         return $this->config->secret();
@@ -148,6 +165,9 @@ class Keycloak
         ]);
     }
 
+    /**
+     * @return string
+     */
     private function parameters(): string
     {
         $parameters = [
@@ -162,6 +182,10 @@ class Keycloak
         return http_build_query($parameters, '', null, PHP_QUERY_RFC3986);
     }
 
+    /**
+     * @param array $parameters
+     * @return array
+     */
     private function addState(array $parameters): array
     {
         if ($this->state) {
@@ -173,6 +197,10 @@ class Keycloak
         return $parameters;
     }
 
+    /**
+     * @param array $parameters
+     * @return array
+     */
     private function addScope(array $parameters): array
     {
         if (empty($this->scope)) {
@@ -182,6 +210,11 @@ class Keycloak
         return array_merge($parameters, ['scope' => $this->scope]);
     }
 
+    /**
+     * @param string $grantType
+     * @param array $grantValue
+     * @return array
+     */
     private function prepareGrantTypeValue(string $grantType, array $grantValue): array
     {
         return array_merge(['grant_type' => $grantType], $grantValue);

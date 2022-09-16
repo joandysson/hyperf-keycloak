@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace Joandysson\Keycloak\Utils;
+namespace Joandysson\Keycloak\Utils\Keycloak;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -27,7 +27,7 @@ class AccountAPI
 
     public function __construct()
     {
-        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
+        $this->config = make(AdapterConfig::class);
         $this->client = make(Client::class, [
            'config' => $this->config()
         ]);
@@ -40,7 +40,7 @@ class AccountAPI
      */
     public function getUser(string $token): ResponseInterface
     {
-        return $this->client->get('/realms/easy/account', [
+        return $this->client->get($this->getAccountUri(), [
             'headers' => $this->getHeaders($token),
         ]);
     }
@@ -53,7 +53,7 @@ class AccountAPI
      */
     public function update(string $token, array $data): ResponseInterface
     {
-        return $this->client->post('/realms/easy/account', [
+        return $this->client->post($this->getAccountUri(), [
             'headers' => $this->getHeaders($token),
             'body' => json_encode($data),
         ]);
@@ -82,4 +82,11 @@ class AccountAPI
         ];
     }
 
+    /**
+     * @return string
+     */
+    private function getAccountUri(): string
+    {
+        return sprintf('/realms/%s/account', $this->config->clientId());
+    }
 }

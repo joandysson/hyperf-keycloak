@@ -17,9 +17,9 @@ use Joandysson\Keycloak\AdapterConfig;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class KeycloakAPI.
+ * Class OidcAPI.
  */
-class KeycloakAPI
+class OidcAPI
 {
     private Client $client;
 

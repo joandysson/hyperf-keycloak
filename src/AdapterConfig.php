@@ -19,18 +19,22 @@ use Joandysson\Keycloak\Exceptions\KeycloakException;
  */
 class AdapterConfig
 {
+    const CONFIG_FILE = 'keycloak';
+
+    private string $oidcConfig;
+
     /**
-     * @param string $oidcConfig
      * @param ConfigInterface $config
      * @throws KeycloakException
      */
     public function __construct(
-        private string $oidcConfig,
         private ConfigInterface $config
     ) {
         if (! filter_var($this->redirectUri(), FILTER_VALIDATE_URL)) {
             throw new KeycloakException('Invalid redirect Uri');
         }
+
+        $this->oidcConfig = sprintf('%s.%s', self::CONFIG_FILE, 'default');
     }
 
     /**
