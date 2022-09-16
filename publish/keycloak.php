@@ -18,5 +18,5 @@ return [
         'oidc_timeout' => env('OIDC_TIMEOUT', '0'), // timeout
         'oidc_scope' => 'openid', // global scope
     ],
-    'default' => 'keycloak'
+    'default' => 'keycloak',
 ];

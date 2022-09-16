@@ -29,43 +29,32 @@ class UserAPI
     {
         $this->config = make(AdapterConfig::class);
         $this->client = make(Client::class, [
-           'config' => $this->config()
+            'config' => $this->config(),
         ]);
     }
 
     /**
-     * @param string $token
-     * @param array $data
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function create(string $token, array $data): ResponseInterface
     {
         return $this->client->get($this->getUserUri(), [
             'headers' => $this->getHeaders($token),
-            'body' => json_encode($data)
+            'body' => json_encode($data),
         ]);
     }
 
-
     /**
-     * @param string $token
-     * @param string $query
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function find(string $token, string $query): ResponseInterface
     {
         $uri = sprintf('%s?q=%s', $this->getUserUri(), $query);
         return $this->client->get('/admin/realms/easy/users', [
-            'headers' => $this->getHeaders($token)
+            'headers' => $this->getHeaders($token),
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return array
-     */
     private function getHeaders(string $token): array
     {
         return [
@@ -74,9 +63,6 @@ class UserAPI
         ];
     }
 
-    /**
-     * @return array
-     */
     private function config(): array
     {
         return [
@@ -89,5 +75,4 @@ class UserAPI
     {
         return sprintf('/admin/realms/%s/users', $this->config->clientId());
     }
-
 }
