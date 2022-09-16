@@ -21,19 +21,18 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AccountAPI
 {
-    private AdapterConfig $config;
-
     private Client $client;
 
-    public function __construct()
+    public function __construct(private AdapterConfig $config)
     {
-        $this->config = make(AdapterConfig::class);
         $this->client = make(Client::class, [
             'config' => $this->config(),
         ]);
     }
 
     /**
+     * @param string $token
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function getUser(string $token): ResponseInterface
@@ -44,6 +43,9 @@ class AccountAPI
     }
 
     /**
+     * @param string $token
+     * @param array $data
+     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function update(string $token, array $data): ResponseInterface
@@ -54,6 +56,10 @@ class AccountAPI
         ]);
     }
 
+    /**
+     * @param string $token
+     * @return array
+     */
     private function getHeaders(string $token): array
     {
         return [
@@ -62,6 +68,9 @@ class AccountAPI
         ];
     }
 
+    /**
+     * @return array
+     */
     private function config(): array
     {
         return [
@@ -70,6 +79,9 @@ class AccountAPI
         ];
     }
 
+    /**
+     * @return string
+     */
     private function getAccountUri(): string
     {
         return sprintf('/realms/%s/account', $this->config->clientId());
