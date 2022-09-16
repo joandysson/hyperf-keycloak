@@ -34,7 +34,18 @@ class AdapterConfig
             throw new KeycloakException('Invalid redirect Uri');
         }
 
-        $this->oidcConfig = sprintf('%s.%s', self::CONFIG_FILE, 'default');
+        $this->oidcConfig = $this->configFileValue($this->getDefault());
+    }
+
+    private function getDefault(): string
+    {
+        $default = $this->configFileValue('default');
+        return $this->config->get($default);
+    }
+
+    private function configFileValue(string $value): string
+    {
+        return sprintf('%s.%s', self::CONFIG_FILE, 'default');
     }
 
     public function host(): string

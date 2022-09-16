@@ -13,7 +13,6 @@ namespace Joandysson\Keycloak\Utils;
 
 /**
  * Class Token.
- * @property int $expiration
  */
 class Token
 {
