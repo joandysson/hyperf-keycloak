@@ -28,9 +28,6 @@ class User
     }
 
     /**
-     * @param string $token
-     * @param array $userInfo
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function create(string $token, array $userInfo): ResponseInterface
@@ -40,9 +37,6 @@ class User
     }
 
     /**
-     * @param string $token
-     * @param array $filters
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function find(string $token, array $filters = []): ResponseInterface
@@ -50,19 +44,54 @@ class User
         return $this->userAPI->find($token, $this->formatFilters($filters));
     }
 
+    public function setCredentials(array $credentials): void
+    {
+        $this->payload['credentials'] = $credentials;
+    }
+
+    public function setAttributes(array $attributes): void
+    {
+        $this->payload['attributes'] = $attributes;
+    }
+
+    public function setRealmRoles(array $realmRoles): void
+    {
+        $this->payload['realmRoles'] = $realmRoles;
+    }
+
+    public function setClientConsents(array $clientConsents): void
+    {
+        $this->payload['clientConsents'] = $clientConsents;
+    }
+
+    public function setDisableableCredentialTypes(array $disableableCredentialTypes): void
+    {
+        $this->payload['disableableCredentialTypes'] = $disableableCredentialTypes;
+    }
+
+    public function setRequiredActions(array $requiredActions): void
+    {
+        $this->payload['requiredActions'] = $requiredActions;
+    }
+
+    public function setAccess(array $access): void
+    {
+        $this->payload['access'] = $access;
+    }
+
+    public function setClientRoles(array $clientRoles): void
+    {
+        $this->payload['clientRoles'] = $clientRoles;
+    }
+
     /**
      * @param $userInfo
-     * @return array
      */
     private function generatePayload($userInfo): array
     {
         return array_merge($userInfo, $this->payload ?? []);
     }
 
-    /**
-     * @param array $filters
-     * @return string
-     */
     private function formatFilters(array $filters): string
     {
         $query = '';
@@ -71,77 +100,5 @@ class User
         }
 
         return trim($query);
-    }
-
-    /**
-     * @param array $credentials
-     * @return void
-     */
-    public function setCredentials(array $credentials): void
-    {
-        $this->payload['credentials'] = $credentials;
-    }
-
-    /**
-     * @param array $attributes
-     * @return void
-     */
-    public function setAttributes(array $attributes): void
-    {
-        $this->payload['attributes'] = $attributes;
-    }
-
-    /**
-     * @param array $realmRoles
-     * @return void
-     */
-    public function setRealmRoles(array $realmRoles): void
-    {
-        $this->payload['realmRoles'] = $realmRoles;
-    }
-
-    /**
-     * @param array $clientConsents
-     * @return void
-     */
-    public function setClientConsents(array $clientConsents): void
-    {
-        $this->payload['clientConsents'] = $clientConsents;
-    }
-
-    /**
-     * @param array $disableableCredentialTypes
-     * @return void
-     */
-    public function setDisableableCredentialTypes(array $disableableCredentialTypes): void
-    {
-        $this->payload['disableableCredentialTypes'] = $disableableCredentialTypes;
-    }
-
-    /**
-     * @param array $requiredActions
-     * @return void
-     */
-    public function setRequiredActions(array $requiredActions): void
-    {
-        $this->payload['requiredActions'] = $requiredActions;
-    }
-
-    /**
-     * @param array $access
-     * @return void
-     */
-    public function setAccess(array $access): void
-    {
-        $this->payload['access'] = $access;
-    }
-
-    /**
-     * @param array $clientRoles
-     * @return void
-     */
-    public function setClientRoles(array $clientRoles): void
-    {
-        $this->payload['clientRoles'] = $clientRoles;
     }
 }

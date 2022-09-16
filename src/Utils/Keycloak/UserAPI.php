@@ -34,9 +34,6 @@ class UserAPI
     }
 
     /**
-     * @param string $token
-     * @param array $data
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function create(string $token, array $data): ResponseInterface
@@ -48,9 +45,6 @@ class UserAPI
     }
 
     /**
-     * @param string $token
-     * @param string $query
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function find(string $token, string $query): ResponseInterface
@@ -61,10 +55,6 @@ class UserAPI
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return array
-     */
     private function getHeaders(string $token): array
     {
         return [
@@ -73,9 +63,6 @@ class UserAPI
         ];
     }
 
-    /**
-     * @return array
-     */
     private function config(): array
     {
         return [
@@ -84,9 +71,6 @@ class UserAPI
         ];
     }
 
-    /**
-     * @return string
-     */
     private function getUserUri(): string
     {
         return sprintf('/admin/realms/%s/users', $this->config->clientId());

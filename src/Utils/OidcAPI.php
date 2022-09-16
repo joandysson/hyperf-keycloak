@@ -34,8 +34,6 @@ class OidcAPI
     }
 
     /**
-     * @param array $grantValue
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function authorization(array $grantValue): ResponseInterface
@@ -47,8 +45,6 @@ class OidcAPI
     }
 
     /**
-     * @param array $data
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function introspect(array $data): ResponseInterface
@@ -60,8 +56,6 @@ class OidcAPI
     }
 
     /**
-     * @param string $refreshToken
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function logout(string $refreshToken): ResponseInterface
@@ -82,10 +76,6 @@ class OidcAPI
         ];
     }
 
-    /**
-     * @param array $grantValue
-     * @return array
-     */
     private function formAuthorization(array $grantValue): array
     {
         return array_merge(
@@ -97,10 +87,6 @@ class OidcAPI
         );
     }
 
-    /**
-     * @param string $refreshToken
-     * @return array
-     */
     private function formLogout(string $refreshToken): array
     {
         return array_merge(
@@ -111,18 +97,11 @@ class OidcAPI
         );
     }
 
-    /**
-     * @param array $data
-     * @return array
-     */
     private function formIntrospect(array $data): array
     {
         return array_merge($data, $this->clientCredentials());
     }
 
-    /**
-     * @return array
-     */
     private function clientCredentials(): array
     {
         return [
@@ -131,9 +110,6 @@ class OidcAPI
         ];
     }
 
-    /**
-     * @return array
-     */
     private function config(): array
     {
         return [
@@ -142,10 +118,6 @@ class OidcAPI
         ];
     }
 
-    /**
-     * @param string $path
-     * @return string
-     */
     private function path(string $path): string
     {
         return sprintf('/realms/%s%s', $this->config->clientId(), $path);

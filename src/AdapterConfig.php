@@ -37,17 +37,6 @@ class AdapterConfig
         $this->oidcConfig = $this->configFileValue($this->getDefault());
     }
 
-    private function getDefault(): string
-    {
-        $default = $this->configFileValue('default');
-        return $this->config->get($default);
-    }
-
-    private function configFileValue(string $value): string
-    {
-        return sprintf('%s.%s', self::CONFIG_FILE, 'default');
-    }
-
     public function host(): string
     {
         return $this->config->get($this->key('oidc_host'));
@@ -76,6 +65,17 @@ class AdapterConfig
     public function timeout(): string
     {
         return $this->config->get($this->key('oidc_timeout'));
+    }
+
+    private function getDefault(): string
+    {
+        $default = $this->configFileValue('default');
+        return $this->config->get($default);
+    }
+
+    private function configFileValue(string $value): string
+    {
+        return sprintf('%s.%s', self::CONFIG_FILE, 'default');
     }
 
     private function key(string $key): string
