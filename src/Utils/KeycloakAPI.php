@@ -11,57 +11,65 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak\Utils;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Joandysson\Keycloak\AdapterConfig;
-use Joandysson\Keycloak\Exceptions\CurlException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class KeycloakAPI.
  */
 class KeycloakAPI
 {
+    private Client $client;
+
     /**
      * @param AdapterConfig $config
      */
     public function __construct(private AdapterConfig $config)
     {
+        $this->client = make(Client::class, [
+            'config' => $this->config()
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @param array $grantValue
+     * @return ResponseInterface
+     * @throws GuzzleException
      */
-    public function authorization(array $grantValue): Response
+    public function authorization(array $grantValue): ResponseInterface
     {
-        $host = sprintf('%s/protocol/openid-connect/token', $this->config->host());
-
-        return Curl::post(
-            $host,
-            $this->getHeaders(),
-            $this->formAuthorization($grantValue)
-        );
+        return $this->client->post($this->path('/protocol/openid-connect/token'), [
+            'headers' => $this->getHeaders(),
+            'form_params' => $this->formAuthorization($grantValue),
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @param array $data
+     * @return ResponseInterface
+     * @throws GuzzleException
      */
-    public function introspect(array $data): Response
+    public function introspect(array $data): ResponseInterface
     {
-        return Curl::post(
-            $this->endpoint('/protocol/openid-connect/token/introspect'),
-            $this->getHeaders(),
-            $this->formIntrospect($data)
-        );
+        return $this->client->post($this->path('/protocol/openid-connect/token/introspect'),[
+            'headers' => $this->getHeaders(),
+            'form_params' => $this->formIntrospect($data),
+        ]);
     }
 
     /**
-     * @throws CurlException
+     * @param string $refreshToken
+     * @return ResponseInterface
+     * @throws GuzzleException
      */
-    public function logout(string $refreshToken): Response
+    public function logout(string $refreshToken): ResponseInterface
     {
-        return Curl::post(
-            $this->endpoint('/protocol/openid-connect/logout'),
-            $this->getHeaders(),
-            $this->formLogout($refreshToken)
-        );
+        return $this->client->post($this->path('/protocol/openid-connect/logout'), [
+            'headers' => $this->getHeaders(),
+            'form_params' => $this->formLogout($refreshToken),
+        ]);
     }
 
     /**
@@ -71,10 +79,13 @@ class KeycloakAPI
     {
         return [
             'Content-Type' => 'application/x-www-form-urlencoded',
-            // 'Authorization' => 'Bearer ' . $this->apiAccessToken->bearer
         ];
     }
 
+    /**
+     * @param array $grantValue
+     * @return array
+     */
     private function formAuthorization(array $grantValue): array
     {
         return array_merge(
@@ -86,6 +97,10 @@ class KeycloakAPI
         );
     }
 
+    /**
+     * @param string $refreshToken
+     * @return array
+     */
     private function formLogout(string $refreshToken): array
     {
         return array_merge(
@@ -96,11 +111,18 @@ class KeycloakAPI
         );
     }
 
+    /**
+     * @param array $data
+     * @return array
+     */
     private function formIntrospect(array $data): array
     {
         return array_merge($data, $this->clientCredentials());
     }
 
+    /**
+     * @return array
+     */
     private function clientCredentials(): array
     {
         return [
@@ -109,8 +131,16 @@ class KeycloakAPI
         ];
     }
 
-    private function endpoint(string $uri): string
+    private function config(): array
     {
-        return sprintf('%s%s', $this->config->host(), $uri);
+        return [
+            'base_uri' => $this->config->host(),
+            'timeout' => $this->config->timeout(),
+        ];
+    }
+
+    private function path(string $path): string
+    {
+        return sprintf('/realms/%s%s', $this->config->clientId(), $path);
     }
 }

@@ -11,29 +11,27 @@ declare(strict_types=1);
  */
 namespace Joandysson\Keycloak;
 
-use Joandysson\Keycloak\Exceptions\CurlException;
+use GuzzleHttp\Exception\GuzzleException;
 use Joandysson\Keycloak\Utils\KeycloakAPI;
-use Joandysson\Keycloak\Utils\Response;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class Keycloak.
  */
 class Keycloak
 {
-    public int $reAuthSleepTime = 30;
-
     private KeycloakAPI $keycloakAPI;
 
     private AdapterConfig $config;
 
-    private string $scope = '';
+    private string $scope;
 
     private string $state = '';
 
     public function __construct()
     {
         $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
-        $this->keycloakAPI = new KeycloakAPI($this->config);
+        $this->keycloakAPI = make(KeycloakAPI::class, ['config' => $this->config]);
         $this->scope = $this->config->scope();
     }
 
@@ -72,9 +70,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function logout(string $refreshToken): Response
+    public function logout(string $refreshToken): ResponseInterface
     {
         return $this->keycloakAPI->logout($refreshToken);
     }
@@ -90,9 +88,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function authorizationCode(string $code): Response
+    public function authorizationCode(string $code): ResponseInterface
     {
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::AUTHORIZATION_CODE, [
             'code' => $code,
@@ -102,9 +100,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function authorizationToken(string $refreshToken): Response
+    public function authorizationToken(string $refreshToken): ResponseInterface
     {
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::REFRESH_TOKEN, [
             'refresh_token' => $refreshToken,
@@ -114,9 +112,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function authorizationLogin(string $username, string $password): Response
+    public function authorizationLogin(string $username, string $password): ResponseInterface
     {
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::PASSWORD, [
             'username' => $username,
@@ -128,9 +126,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
+     * @throws GuzzleException
      */
-    public function authorizationClientCredentials(): Response
+    public function authorizationClientCredentials(): ResponseInterface
     {
         $grantTypeValue = $this->prepareGrantTypeValue(GrantTypes::CLIENT_CREDENTIALS, [
             'scope' => $this->scope,
@@ -140,10 +138,9 @@ class Keycloak
     }
 
     /**
-     * @throws CurlException
-     * @return Response
+     * @throws GuzzleException
      */
-    public function introspect(string $token, string $username): Utils\Response
+    public function introspect(string $token, string $username): ResponseInterface
     {
         return $this->keycloakAPI->introspect([
             'token' => $token,

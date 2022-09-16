@@ -15,21 +15,12 @@ namespace Joandysson\Keycloak\Utils;
  * Class Token.
  * @property int $expiration
  */
-abstract class Token
+class Token
 {
-    protected string $accessToken;
-
-    protected string $refreshToken;
-
     /**
      * Token constructor.
      */
-    public function __construct(protected int $expiration)
+    public function __construct()
     {
-    }
-
-    public function getExpiration(): int
-    {
-        return $this->expiration;
     }
 }

@@ -33,35 +33,59 @@ class AdapterConfig
         }
     }
 
+    /**
+     * @return string
+     */
     public function host(): string
     {
         return $this->config->get($this->key('oidc_host'));
     }
 
+    /**
+     * @return string
+     */
     public function clientId(): string
     {
         return $this->config->get($this->key('oidc_client_id'));
     }
 
+    /**
+     * @return string
+     */
     public function secret(): string
     {
         return $this->config->get($this->key('oidc_client_secret'));
     }
 
+    /**
+     * @return string
+     */
     public function redirectUri(): string
     {
         return $this->config->get($this->key('oidc_redirect_url'));
     }
 
+    /**
+     * @return string
+     */
     public function scope(): string
     {
         return $this->config->get($this->key('oidc_scope'));
     }
 
     /**
-     * @param $key
+     * @return string
      */
-    private function key($key): string
+    public function timeout(): string
+    {
+        return $this->config->get($this->key('oidc_timeout'));
+    }
+
+    /**
+     * @param string $key
+     * @return string
+     */
+    private function key(string $key): string
     {
         return sprintf('%s.%s', $this->oidcConfig, $key);
     }
