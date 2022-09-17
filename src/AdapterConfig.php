@@ -30,11 +30,11 @@ class AdapterConfig
     public function __construct(
         private ConfigInterface $config
     ) {
+        $this->oidcConfig = $this->configFileValue($this->getDefault());
+
         if (! filter_var($this->redirectUri(), FILTER_VALIDATE_URL)) {
             throw new KeycloakException('Invalid redirect Uri');
         }
-
-        $this->oidcConfig = $this->configFileValue($this->getDefault());
     }
 
     public function host(): string
@@ -75,7 +75,7 @@ class AdapterConfig
 
     private function configFileValue(string $value): string
     {
-        return sprintf('%s.%s', self::CONFIG_FILE, 'default');
+        return sprintf('%s.%s', self::CONFIG_FILE, $value);
     }
 
     private function key(string $key): string
