@@ -29,7 +29,7 @@ class OidcAPI
     public function __construct(private AdapterConfig $config)
     {
         $this->client = make(Client::class, [
-            'config' => $this->config(),
+            'config' => $this->clientConfig(),
         ]);
     }
 
@@ -110,7 +110,7 @@ class OidcAPI
         ];
     }
 
-    private function config(): array
+    private function clientConfig(): array
     {
         return [
             'base_uri' => $this->config->host(),
