@@ -38,7 +38,7 @@ class UserAPI
      */
     public function create(string $token, array $data): ResponseInterface
     {
-        return $this->client->get($this->getUserUri(), [
+        return $this->client->post($this->getUserUri(), [
             'headers' => $this->getHeaders($token),
             'body' => json_encode($data),
         ]);
@@ -50,7 +50,7 @@ class UserAPI
     public function find(string $token, string $query): ResponseInterface
     {
         $uri = sprintf('%s?q=%s', $this->getUserUri(), $query);
-        return $this->client->get('/admin/realms/easy/users', [
+        return $this->client->get($uri, [
             'headers' => $this->getHeaders($token),
         ]);
     }
