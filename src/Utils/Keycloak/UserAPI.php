@@ -50,7 +50,7 @@ class UserAPI
     public function update(string $token, string $id, array $data): ResponseInterface
     {
         $uri = sprintf('%s/%s', $this->getUserUri(), $id);
-        return $this->client->post($uri, [
+        return $this->client->put($uri, [
             'headers' => $this->getHeaders($token),
             'body' => json_encode($data),
         ]);
@@ -85,7 +85,7 @@ class UserAPI
     public function findOne(string $token, string $id): ResponseInterface
     {
         $uri = sprintf('%s/%s', $this->getUserUri(), $id);
-        return $this->client->post($uri, [
+        return $this->client->get($uri, [
             'headers' => $this->getHeaders($token),
         ]);
     }
@@ -96,7 +96,7 @@ class UserAPI
     public function count(string $token): ResponseInterface
     {
         $uri = sprintf('%s/count', $this->getUserUri());
-        return $this->client->post($uri, [
+        return $this->client->get($uri, [
             'headers' => $this->getHeaders($token),
         ]);
     }

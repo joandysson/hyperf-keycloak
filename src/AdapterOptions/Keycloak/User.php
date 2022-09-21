@@ -42,8 +42,7 @@ class User
     public function update(string $token, string $userId, array $userInfo): ResponseInterface
     {
         $payload = $this->generatePayload($userInfo);
-        $uri = sprintf('%s/%s/%s', $this->getUserUri(), '', '');
-        return $this->userAPI->create($token, $payload);
+        return $this->userAPI->update($token, $userId, $payload);
     }
 
     /**
