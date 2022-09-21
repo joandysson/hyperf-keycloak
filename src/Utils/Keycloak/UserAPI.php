@@ -17,7 +17,7 @@ use Joandysson\Keycloak\AdapterConfig;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class AccountAPI.
+ * Class UserAPI.
  */
 class UserAPI
 {
@@ -47,10 +47,56 @@ class UserAPI
     /**
      * @throws GuzzleException
      */
+    public function update(string $token, string $id, array $data): ResponseInterface
+    {
+        $uri = sprintf('%s/%s', $this->getUserUri(), $id);
+        return $this->client->post($uri, [
+            'headers' => $this->getHeaders($token),
+            'body' => json_encode($data),
+        ]);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function resetPassword(string $token, string $id, array $data): ResponseInterface
+    {
+        $uri = sprintf('%s/%s/reset-password', $this->getUserUri(), $id);
+        return $this->client->post($uri, [
+            'headers' => $this->getHeaders($token),
+            'body' => json_encode($data),
+        ]);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function find(string $token, string $query): ResponseInterface
     {
         $uri = sprintf('%s?q=%s', $this->getUserUri(), $query);
         return $this->client->get($uri, [
+            'headers' => $this->getHeaders($token),
+        ]);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function findOne(string $token, string $id): ResponseInterface
+    {
+        $uri = sprintf('%s/%s', $this->getUserUri(), $id);
+        return $this->client->post($uri, [
+            'headers' => $this->getHeaders($token),
+        ]);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function count(string $token): ResponseInterface
+    {
+        $uri = sprintf('%s/count', $this->getUserUri());
+        return $this->client->post($uri, [
             'headers' => $this->getHeaders($token),
         ]);
     }

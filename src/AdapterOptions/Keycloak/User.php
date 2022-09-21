@@ -39,9 +39,43 @@ class User
     /**
      * @throws GuzzleException
      */
+    public function update(string $token, string $userId, array $userInfo): ResponseInterface
+    {
+        $payload = $this->generatePayload($userInfo);
+        $uri = sprintf('%s/%s/%s', $this->getUserUri(), '', '');
+        return $this->userAPI->create($token, $payload);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function count(string $token): ResponseInterface
+    {
+        return $this->userAPI->count($token);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function resetPassword(string $token, string $id, array $passInfo): ResponseInterface
+    {
+        return $this->userAPI->resetPassword($token, $id, $passInfo);
+    }
+
+    /**
+     * @throws GuzzleException
+     */
     public function find(string $token, array $filters = []): ResponseInterface
     {
         return $this->userAPI->find($token, $this->formatFilters($filters));
+    }
+
+    /**
+     * @throws GuzzleException
+     */
+    public function findOne(string $token, string $id): ResponseInterface
+    {
+        return $this->userAPI->findOne($token, $id);
     }
 
     public function setCredentials(array $credentials): void
