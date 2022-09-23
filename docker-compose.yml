@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  keycloak-adapter:
+    container_name: keycloak-adapter
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TIMEZONE: 'Asia/Shanghai'
+    command: "sleep infinity"
+    volumes:
+      - ./:/app
+    working_dir: /app
