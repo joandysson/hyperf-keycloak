@@ -17,9 +17,9 @@ use Joandysson\Keycloak\AdapterConfig;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Class KeycloakAPI.
+ * Class OidcAPI.
  */
-class KeycloakAPI
+class OidcAPI
 {
     private Client $client;
 
@@ -29,13 +29,11 @@ class KeycloakAPI
     public function __construct(private AdapterConfig $config)
     {
         $this->client = make(Client::class, [
-            'config' => $this->config()
+            'config' => $this->clientConfig(),
         ]);
     }
 
     /**
-     * @param array $grantValue
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function authorization(array $grantValue): ResponseInterface
@@ -47,21 +45,17 @@ class KeycloakAPI
     }
 
     /**
-     * @param array $data
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function introspect(array $data): ResponseInterface
     {
-        return $this->client->post($this->path('/protocol/openid-connect/token/introspect'),[
+        return $this->client->post($this->path('/protocol/openid-connect/token/introspect'), [
             'headers' => $this->getHeaders(),
             'form_params' => $this->formIntrospect($data),
         ]);
     }
 
     /**
-     * @param string $refreshToken
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function logout(string $refreshToken): ResponseInterface
@@ -82,10 +76,6 @@ class KeycloakAPI
         ];
     }
 
-    /**
-     * @param array $grantValue
-     * @return array
-     */
     private function formAuthorization(array $grantValue): array
     {
         return array_merge(
@@ -97,10 +87,6 @@ class KeycloakAPI
         );
     }
 
-    /**
-     * @param string $refreshToken
-     * @return array
-     */
     private function formLogout(string $refreshToken): array
     {
         return array_merge(
@@ -111,18 +97,11 @@ class KeycloakAPI
         );
     }
 
-    /**
-     * @param array $data
-     * @return array
-     */
     private function formIntrospect(array $data): array
     {
         return array_merge($data, $this->clientCredentials());
     }
 
-    /**
-     * @return array
-     */
     private function clientCredentials(): array
     {
         return [
@@ -131,7 +110,7 @@ class KeycloakAPI
         ];
     }
 
-    private function config(): array
+    private function clientConfig(): array
     {
         return [
             'base_uri' => $this->config->host(),

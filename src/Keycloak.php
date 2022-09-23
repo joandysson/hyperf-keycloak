@@ -12,7 +12,8 @@ declare(strict_types=1);
 namespace Joandysson\Keycloak;
 
 use GuzzleHttp\Exception\GuzzleException;
-use Joandysson\Keycloak\Utils\KeycloakAPI;
+use Joandysson\Keycloak\Utils\GrantTypes;
+use Joandysson\Keycloak\Utils\OidcAPI;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -20,7 +21,7 @@ use Psr\Http\Message\ResponseInterface;
  */
 class Keycloak
 {
-    private KeycloakAPI $keycloakAPI;
+    private OidcAPI $keycloakAPI;
 
     private AdapterConfig $config;
 
@@ -30,8 +31,8 @@ class Keycloak
 
     public function __construct()
     {
-        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
-        $this->keycloakAPI = make(KeycloakAPI::class, ['config' => $this->config]);
+        $this->config = make(AdapterConfig::class);
+        $this->keycloakAPI = make(OidcAPI::class);
         $this->scope = $this->config->scope();
     }
 

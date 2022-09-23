@@ -19,72 +19,65 @@ use Joandysson\Keycloak\Exceptions\KeycloakException;
  */
 class AdapterConfig
 {
+    public const CONFIG_FILE = 'keycloak';
+
+    private string $oidcConfig;
+
     /**
-     * @param string $oidcConfig
      * @param ConfigInterface $config
      * @throws KeycloakException
      */
     public function __construct(
-        private string $oidcConfig,
         private ConfigInterface $config
     ) {
+        $this->oidcConfig = $this->configFileValue($this->getDefault());
+
         if (! filter_var($this->redirectUri(), FILTER_VALIDATE_URL)) {
             throw new KeycloakException('Invalid redirect Uri');
         }
     }
 
-    /**
-     * @return string
-     */
     public function host(): string
     {
         return $this->config->get($this->key('oidc_host'));
     }
 
-    /**
-     * @return string
-     */
     public function clientId(): string
     {
         return $this->config->get($this->key('oidc_client_id'));
     }
 
-    /**
-     * @return string
-     */
     public function secret(): string
     {
         return $this->config->get($this->key('oidc_client_secret'));
     }
 
-    /**
-     * @return string
-     */
     public function redirectUri(): string
     {
         return $this->config->get($this->key('oidc_redirect_url'));
     }
 
-    /**
-     * @return string
-     */
     public function scope(): string
     {
         return $this->config->get($this->key('oidc_scope'));
     }
 
-    /**
-     * @return string
-     */
     public function timeout(): string
     {
         return $this->config->get($this->key('oidc_timeout'));
     }
 
-    /**
-     * @param string $key
-     * @return string
-     */
+    private function getDefault(): string
+    {
+        $default = $this->configFileValue('default');
+        return $this->config->get($default);
+    }
+
+    private function configFileValue(string $value): string
+    {
+        return sprintf('%s.%s', self::CONFIG_FILE, $value);
+    }
+
     private function key(string $key): string
     {
         return sprintf('%s.%s', $this->oidcConfig, $key);

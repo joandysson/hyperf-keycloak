@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace Joandysson\Keycloak\Utils;
+namespace Joandysson\Keycloak\Utils\Keycloak;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -21,48 +21,36 @@ use Psr\Http\Message\ResponseInterface;
  */
 class AccountAPI
 {
-    private AdapterConfig $config;
-
     private Client $client;
 
-    public function __construct()
+    public function __construct(private AdapterConfig $config)
     {
-        $this->config = make(AdapterConfig::class, ['oidcConfig' => 'keycloak']);
         $this->client = make(Client::class, [
-           'config' => $this->config()
+            'config' => $this->config(),
         ]);
     }
 
     /**
-     * @param string $token
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function getUser(string $token): ResponseInterface
     {
-        return $this->client->get('/realms/easy/account', [
+        return $this->client->get($this->getAccountUri(), [
             'headers' => $this->getHeaders($token),
         ]);
     }
 
     /**
-     * @param string $token
-     * @param array $data
-     * @return ResponseInterface
      * @throws GuzzleException
      */
     public function update(string $token, array $data): ResponseInterface
     {
-        return $this->client->post('/realms/easy/account', [
+        return $this->client->post($this->getAccountUri(), [
             'headers' => $this->getHeaders($token),
             'body' => json_encode($data),
         ]);
     }
 
-    /**
-     * @param string $token
-     * @return array
-     */
     private function getHeaders(string $token): array
     {
         return [
@@ -71,9 +59,6 @@ class AccountAPI
         ];
     }
 
-    /**
-     * @return array
-     */
     private function config(): array
     {
         return [
@@ -82,4 +67,8 @@ class AccountAPI
         ];
     }
 
+    private function getAccountUri(): string
+    {
+        return sprintf('/realms/%s/account', $this->config->clientId());
+    }
 }

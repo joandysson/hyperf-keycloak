@@ -9,17 +9,8 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace Joandysson\Keycloak\Utils;
+namespace Joandysson\Keycloak\AdapterOptions\Keycloak;
 
-/**
- * Class Token.
- */
-class Token
+class Account
 {
-    /**
-     * Token constructor.
-     */
-    public function __construct()
-    {
-    }
 }

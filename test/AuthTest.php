@@ -11,9 +11,7 @@ declare(strict_types=1);
  */
 namespace HyperfTest;
 
-
 //use Joandysson\Keycloak\KeycloakAdapter;
-use GuzzleHttp\Client;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -32,5 +30,4 @@ class AuthTest extends TestCase
 
         $this->assertEquals(1, 1);
     }
-
 }
